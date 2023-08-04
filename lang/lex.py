@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 
 from source import *
+from exception import *
 
 
 class TokenType(Enum):
@@ -17,6 +18,8 @@ class TokenType(Enum):
     FLOAT = auto()
     NAME = auto()
     BOOL = auto()
+
+    EOF = auto()
 
 
 @dataclass
@@ -74,7 +77,9 @@ def lex(src: SourceCode) -> list[Token]:
             token = lex_unknown(cursor)
             tokens.append(token)
             logging.debug("Lexed unknown: " + str(token))
-    return validate(tokens)
+    tokens = validate(tokens)
+    eof_span = len(src.text)
+    return tokens + [Token(Span(src, eof_span, eof_span), "", TokenType.EOF)]
 
 
 def is_number_or_name_char(c):
@@ -149,11 +154,11 @@ def validate_number_or_name(token: Token):
     elif is_name(token.text):
         return Token(token.span, token.text, TokenType.NAME)
     else:
-        raise Exception(f"Invalid token: {token}")
+        raise InterpreterException(f"Invalid token: {token}")
 
 
 def validate_unknown(token: Token):
-    raise Exception(f"Invalid token: {token}")
+    raise InterpreterException(f"Invalid token: {token}")
 
 
 def is_float(text: str) -> bool:
