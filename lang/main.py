@@ -17,16 +17,9 @@ def run(text: str) -> ProgramNode:
 
 
 src = '''
-abc   let
-3.14
-True
-False
-if
-then
-else
-;
-.2137
-== 2 2
+123; 567;
+123;
+567;
 '''
 
 run(src)
